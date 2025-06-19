@@ -47,14 +47,14 @@ fn delete_epic_prompt() -> bool {
         "Are you sure you want to delete this epic? All stories in this epic will also be deleted [Y/n]:"
     );
     let confirmation = get_user_input();
-    confirmation.to_lowercase() == "y"
+    confirmation.trim().to_lowercase() == "y"
 }
 
 fn delete_story_prompt() -> bool {
     println!("----------------------------");
     println!("Are you sure you want to delete this story? [Y/n]:");
     let confirmation = get_user_input();
-    confirmation.to_lowercase() == "y"
+    confirmation.trim().to_lowercase() == "y"
 }
 
 fn update_status_prompt() -> Option<Status> {
