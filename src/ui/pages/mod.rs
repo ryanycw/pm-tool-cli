@@ -1,3 +1,4 @@
+use std::any::Any;
 use std::rc::Rc;
 
 use anyhow::Result;
@@ -13,6 +14,7 @@ use page_helpers::*;
 pub trait Page {
     fn draw_page(&self) -> Result<()>;
     fn handle_input(&self, input: &str) -> Result<Option<Action>>;
+    fn as_any(&self) -> &dyn Any;
 }
 
 pub struct HomePage {
@@ -30,9 +32,9 @@ impl Page for HomePage {
             let epic = db_state.epics.get(epic_id).unwrap();
             println!(
                 "{} | {} | {}",
-                get_column_string(epic_id.to_string().as_str(), 10),
-                get_column_string(epic.name.as_str(), 30),
-                get_column_string(epic.status.to_string().as_str(), 10)
+                get_column_string(epic_id.to_string().as_str(), 11),
+                get_column_string(epic.name.as_str(), 32),
+                get_column_string(epic.status.to_string().as_str(), 17)
             );
         });
 
@@ -45,9 +47,14 @@ impl Page for HomePage {
     }
 
     fn handle_input(&self, input: &str) -> Result<Option<Action>> {
+        println!("handle_input: {}", input);
+
         match input {
             "q" => Ok(Some(Action::Exit)),
-            "c" => Ok(Some(Action::CreateEpic)),
+            "c" => {
+                println!("create epic");
+                Ok(Some(Action::CreateEpic))
+            }
             _ => match input.parse::<u32>() {
                 Ok(epic_id) => {
                     let db_state = self.db.read_db()?;
@@ -59,6 +66,10 @@ impl Page for HomePage {
                 Err(_) => Ok(None),
             },
         }
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 
@@ -80,10 +91,11 @@ impl Page for EpicDetail {
 
         // print out epic details using get_column_string()
         println!(
-            "{} | {} | {}",
-            get_column_string(&self.epic_id.to_string().as_str(), 10),
-            get_column_string(epic.name.as_str(), 30),
-            get_column_string(epic.status.to_string().as_str(), 10)
+            "{} | {} | {} | {}",
+            get_column_string(&self.epic_id.to_string().as_str(), 5),
+            get_column_string(epic.name.as_str(), 12),
+            get_column_string(epic.description.as_str(), 27),
+            get_column_string(epic.status.to_string().as_str(), 13)
         );
 
         println!();
@@ -97,9 +109,9 @@ impl Page for EpicDetail {
             let story = db_state.stories.get(story_id).unwrap();
             println!(
                 "{} | {} | {}",
-                get_column_string(story_id.to_string().as_str(), 10),
-                get_column_string(story.name.as_str(), 30),
-                get_column_string(story.status.to_string().as_str(), 10)
+                get_column_string(story_id.to_string().as_str(), 11),
+                get_column_string(story.name.as_str(), 32),
+                get_column_string(story.status.to_string().as_str(), 17)
             );
         });
 
@@ -140,6 +152,10 @@ impl Page for EpicDetail {
             },
         }
     }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
 }
 
 pub struct StoryDetail {
@@ -161,10 +177,11 @@ impl Page for StoryDetail {
 
         // print out story details using get_column_string()
         println!(
-            "{} | {} | {}",
-            get_column_string(&self.story_id.to_string().as_str(), 10),
-            get_column_string(story.name.as_str(), 30),
-            get_column_string(story.status.to_string().as_str(), 10)
+            "{} | {} | {} | {}",
+            get_column_string(&self.story_id.to_string().as_str(), 5),
+            get_column_string(story.name.as_str(), 12),
+            get_column_string(story.description.as_str(), 27),
+            get_column_string(story.status.to_string().as_str(), 13)
         );
 
         println!();
@@ -188,6 +205,10 @@ impl Page for StoryDetail {
             })),
             _ => Ok(None),
         }
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 
