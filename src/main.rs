@@ -36,30 +36,25 @@ fn main() {
 
         // TODO: implement the following functionality:
         // 1. get current page from navigator. If there is no current page exit the loop.
-        let current_page = nav.get_current_page().unwrap();
-
-        // 2. render page
-        if let Err(error) = current_page.draw_page() {
-            println!("Error: {}", error);
-            wait_for_key_press();
-        }
-
-        // 3. get user input
-        let input = get_user_input();
-        println!("input: {}", input);
-
-        // 4. pass input to page's input handler
-        let action = current_page.handle_input(&input.trim()).unwrap();
-        println!("action: {:?}", action);
-
-        // sleep for 5 seconds
-        std::thread::sleep(std::time::Duration::from_secs(5));
-
-        // 5. if the page's input handler returns an action let the navigator process the action
-        if let Some(action) = action {
-            if let Err(error) = nav.handle_action(action) {
+        if let Some(page) = nav.get_current_page() {
+            // 2. render page
+            if let Err(error) = page.draw_page() {
                 println!("Error: {}", error);
                 wait_for_key_press();
+            }
+
+            // 3. get user input
+            let input = get_user_input();
+
+            // 4. pass input to page's input handler
+            let action = page.handle_input(&input.trim()).unwrap();
+
+            // 5. if the page's input handler returns an action let the navigator process the action
+            if let Some(action) = action {
+                if let Err(error) = nav.handle_action(action) {
+                    println!("Error: {}", error);
+                    wait_for_key_press();
+                }
             }
         }
     }
